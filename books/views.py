@@ -3,7 +3,7 @@ from .models import Book
 from .serializers import BookSerializer
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .permissions import IsUserAdmin
+from users.permissions import IsUserAdmin
 
 
 class BookView(ListCreateAPIView):
