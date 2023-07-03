@@ -4,9 +4,11 @@ from .serializers import BookSerializer
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from users.permissions import IsUserAdmin
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
 class BookView(ListCreateAPIView):
+    authentication_classes = [JWTAuthentication]
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [AllowAny]
@@ -19,6 +21,7 @@ class BookView(ListCreateAPIView):
 
 
 class BookDetailedView(RetrieveUpdateDestroyAPIView):
+    authentication_classes = [JWTAuthentication]
     queryset = Book.objects.all()
     serializer_class = BookSerializer
 
