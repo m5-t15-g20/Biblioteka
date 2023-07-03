@@ -23,7 +23,7 @@ class LeadingSerializer(serializers.ModelSerializer):
         return expire_date
 
     def create(self, validated_data: dict) -> Lending:
-        user_id = validated_data["user"]
-        user = User.objects.get(id=user_id)
-        print(user)
+        # user_id = validated_data["user"]
+        # user = User.objects.get(id=user_id)
+        # print(user)
         return Lending.objects.create(**validated_data)
