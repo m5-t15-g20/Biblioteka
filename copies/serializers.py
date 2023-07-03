@@ -13,18 +13,8 @@ class CopySerializers(serializers.ModelSerializer):
         fields = ["id", "library_name", "created_at", "book"]
         extra_kwargs = {
             "id": {"read_only": True},
-            "book": {"read_only": True}
+            # "book": {"read_only": True}
         }
 
     def create(self, validated_data: dict) -> Copy:
-        id = validated_data.get("book")
-        books = get_object_or_404(Book, pk=id)
-
-        # try:
-        #     books = get_object_or_404(Book, pk=id)
-        # except Exception.DoesNotExist:
-        #     # raise CustomNotFoundError()
-        #     ...
-        
         return Copy.objects.create(**validated_data)
-    

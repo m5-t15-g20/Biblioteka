@@ -1,11 +1,12 @@
 from rest_framework.views import Response, Request
-from django.shortcuts import render
 from books.permissions import IsUserAdmin
 from .models import Copy
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from copies.serializers import CopySerializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.shortcuts import get_object_or_404
+from books.models import Book 
 
 
 class CopyView(ListCreateAPIView):
@@ -23,6 +24,10 @@ class CopyView(ListCreateAPIView):
         if self.request.method == "POST":
             self.permission_classes = [IsAuthenticated, IsUserAdmin]
         return super().get_permissions()
+    
+    def perform_create(self, serializer):
+        book_found = get_object_or_404(Book, id=self.request.data['book'])
+        serializer.save(book=book_found)
 
 class CopyDetailViews(RetrieveUpdateDestroyAPIView):
     authentication_classes = [JWTAuthentication]
