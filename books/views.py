@@ -5,6 +5,7 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from users.permissions import IsUserAdmin
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.views import Response
 
 
 class BookView(ListCreateAPIView):
@@ -12,7 +13,6 @@ class BookView(ListCreateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [AllowAny]
-    lookup_field = "pk"
 
     def get_permissions(self):
         if self.request.method == "POST":
@@ -24,6 +24,7 @@ class BookDetailedView(RetrieveUpdateDestroyAPIView):
     authentication_classes = [JWTAuthentication]
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+    lookup_field = "pk"
 
     def get_permissions(self):
         if self.request.method == "GET":
@@ -32,8 +33,9 @@ class BookDetailedView(RetrieveUpdateDestroyAPIView):
             self.permission_classes = [IsAuthenticated, IsUserAdmin]
         return super().get_permissions()
 
-    def update(self, instance, validated_data):
-        for key, value in validated_data.items():
-            setattr(instance, key, value)
-        instance.save()
-        return instance
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
