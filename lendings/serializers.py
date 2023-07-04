@@ -5,11 +5,11 @@ from django.shortcuts import get_object_or_404
 from users.models import User
 from rest_framework.response import Response
 from rest_framework.views import status
-import ipdb
+
+# import ipdb
 
 
 class LeadingSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Lending
         fields = ["id", "is_avaliable", "expire_date", "lending_date", "user", "copy"]
@@ -36,5 +36,7 @@ class LeadingSerializer(serializers.ModelSerializer):
         user = get_object_or_404(User, pk=id)
         # ipdb.set_trace()
         if user.is_authorized is False:
-            raise exceptions.AuthenticationFailed("User not authorized to make a lending")
+            raise exceptions.AuthenticationFailed(
+                "User not authorized to make a lending"
+            )
         return Lending.objects.create(**validated_data)

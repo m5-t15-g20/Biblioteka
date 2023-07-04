@@ -6,7 +6,7 @@ from copies.serializers import CopySerializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.shortcuts import get_object_or_404
-from books.models import Book 
+from books.models import Book
 
 
 class CopyView(ListCreateAPIView):
@@ -26,7 +26,7 @@ class CopyView(ListCreateAPIView):
         return super().get_permissions()
 
     def perform_create(self, serializer):
-        book_found = get_object_or_404(Book, id=self.request.data['book'])
+        book_found = get_object_or_404(Book, id=self.request.data["book"])
         serializer.save(book=book_found)
 
 

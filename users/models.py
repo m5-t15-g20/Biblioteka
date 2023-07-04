@@ -12,4 +12,6 @@ class User(AbstractUser):
         unique=True, error_messages={"unique": "This field must be unique."}
     )
     is_authorized = models.BooleanField(default=True)
-    user_type = models.CharField(max_length=20, choices=user_choices, default="Student")
+    user_type = models.CharField(
+        max_length=20, choices=user_choices, default="Student", blank=True, null=True
+    )
