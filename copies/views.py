@@ -19,15 +19,16 @@ class CopyView(ListCreateAPIView):
         copies = self.get_queryset()
         serializer = self.get_serializer(copies, many=True)
         return Response(serializer.data)
-    
+
     def get_permissions(self):
         if self.request.method == "POST":
             self.permission_classes = [IsAuthenticated, IsUserAdmin]
         return super().get_permissions()
-    
+
     def perform_create(self, serializer):
         book_found = get_object_or_404(Book, id=self.request.data['book'])
         serializer.save(book=book_found)
+
 
 class CopyDetailViews(RetrieveUpdateDestroyAPIView):
     authentication_classes = [JWTAuthentication]
@@ -40,13 +41,13 @@ class CopyDetailViews(RetrieveUpdateDestroyAPIView):
         else:
             self.permission_classes = [IsAuthenticated, IsUserAdmin]
         return super().get_permissions()
-    
+
     def update(self, instance, validated_data):
         for key, value in validated_data.items():
             setattr(instance, key, value)
         instance.save()
         return instance
-    
+
     def get_copie(self, request: Request, pk):
         copies = Copy.objects.filter(copy=pk)
         serializer = CopySerializers(copies, many=True)
