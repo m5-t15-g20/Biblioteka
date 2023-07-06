@@ -9,4 +9,3 @@ class BookSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data: dict) -> Book:
         return Book.objects.create(**validated_data)
-
