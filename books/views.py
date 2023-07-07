@@ -78,6 +78,7 @@ class BookFollowUnfollow(ListCreateAPIView):
             return Response(
                 "You already follow this book", status=status.HTTP_403_FORBIDDEN
             )
+
         else:
             request.user.following.add(book_iby_id)
             return Response("Following Book", status=status.HTTP_201_CREATED)
