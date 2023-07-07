@@ -1,41 +1,49 @@
-from django.shortcuts import render
-from .models import Book
-from .serializers import BookSerializer
+from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from users.permissions import IsUserAdmin
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.views import Response
+from rest_framework.views import APIView, Request, Response, status
+
+from .models import Book, Favorite
+from .serializers import BookSerializer, FavoriteSerializer
+from .permissions import IsAdminOrReadOnly
+
+from users.models import User
 
 
 class BookView(ListCreateAPIView):
     authentication_classes = [JWTAuthentication]
-    queryset = Book.objects.all()
-    serializer_class = BookSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminOrReadOnly]
 
-    def get_permissions(self):
-        if self.request.method == "POST":
-            self.permission_classes = [IsAuthenticated, IsUserAdmin]
-        return super().get_permissions()
+    serializer_class = BookSerializer
+    queryset = Book.objects.all()
 
 
 class BookDetailedView(RetrieveUpdateDestroyAPIView):
     authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminOrReadOnly]
+
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    lookup_field = "pk"
 
-    def get_permissions(self):
-        if self.request.method == "GET":
-            self.permission_classes = [AllowAny]
-        else:
-            self.permission_classes = [IsAuthenticated, IsUserAdmin]
-        return super().get_permissions()
 
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
+class FavoriteView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request, pk: int) -> Response:
+        obj = get_object_or_404(Favorite, book=pk, user=request.user)
+        print(obj)
+        serializer = FavoriteSerializer(data=request.data)
+        return serializer
+
+    def post(self, request: Request, pk: int) -> Response:
+        user_obj = get_object_or_404(User, id=request.user.id)
+        book_obj = get_object_or_404(Book, id=pk)
+
+        serializer = FavoriteSerializer(request.data, user=user_obj, book=book_obj)
         serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
+
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

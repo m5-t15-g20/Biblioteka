@@ -1,8 +1,10 @@
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
+
 from .serializers import UserSerializer
 from .models import User
 from .permissions import IsOwnerOrAdmin, IsAdminOrPost
+
 from django.contrib.auth.hashers import make_password
 
 
