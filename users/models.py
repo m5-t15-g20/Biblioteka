@@ -15,3 +15,7 @@ class User(AbstractUser):
     user_type = models.CharField(
         max_length=20, choices=user_choices, default="Student", blank=True, null=True
     )
+    following = models.ManyToManyField("books.Book", related_name="followers")
+
+
+
