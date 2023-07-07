@@ -7,4 +7,16 @@ class Book(models.Model):
     sinopse = models.TextField(null=True, default=None)
     coverImage = models.CharField(max_length=50, null=True, default=None)
     pageQuantity = models.IntegerField(null=False)
-    # user = models.ManyToManyField("users.User", on_delete=models.CASCADE, related_name="books")
+    # users = models.ManyToManyField(
+    #     "users.User", through="books.Followers", related_name="book_user_relation"
+    # )
+
+
+# class Followers(models.Model):
+#     book = models.ForeignKey(
+#         "books.Book", on_delete=models.CASCADE, related_name="user_book"
+#     )
+
+#     user = models.ForeignKey(
+#         "users.User", on_delete=models.CASCADE, related_name="book_user", null=True
+#     )

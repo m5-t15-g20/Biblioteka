@@ -2,9 +2,12 @@ from rest_framework import serializers
 from .models import User
 
 from django.contrib.auth.hashers import make_password
+from books.serializers import BookSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
+    following = BookSerializer(many=True, read_only=True)
+
     class Meta:
         model = User
         fields = [
@@ -15,11 +18,13 @@ class UserSerializer(serializers.ModelSerializer):
             "is_authorized",
             "is_superuser",
             "user_type",
+            "following",
         ]
         extra_kwargs = {
             "password": {"write_only": True},
             "is_authorized": {"read_only": True},
             "is_superuser": {"read_only": True},
+            "following": {"read_only": True},
         }
 
     def create(self, validated_data: dict) -> User:
