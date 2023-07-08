@@ -50,3 +50,9 @@ class LeadingSerializer(serializers.ModelSerializer):
 
 class LendginCreate(LeadingSerializer):
     expire_date = serializers.DateField(read_only=True)
+
+
+class SendEmailSerializer(serializers.Serializer):
+    subject = serializers.CharField()
+    message = serializers.CharField()
+    recipient_list = serializers.ListField()
