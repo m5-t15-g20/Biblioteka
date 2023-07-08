@@ -6,10 +6,13 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.shortcuts import get_object_or_404
 from users.models import User
 from copies.models import Copy
+from books.models import Book
 from datetime import date, timedelta
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 class LendingView(ListCreateAPIView):
@@ -71,6 +74,15 @@ class CloseLendingView(UpdateAPIView):
         copy = lending.copy
         copy.is_available = True
         copy.save()
+        book = get_object_or_404(Book, pk=copy.book.id)
+        user = get_object_or_404(User, pk=lending.user.id)
+        subject = "O livro que você estava seguindo estar disponível!"
+        message = f'O livro "{book.title}" ficou disponível para empréstimo. Não perca a chance de lê-lo!'
+        from_email = settings.EMAIL_HOST_USER
+        recipient_list = [user.email]
+        send_mail(
+            subject, message, from_email, recipient_list, fail_silently=False
+        )
         return super().update(request, *args, **kwargs)
 
 
