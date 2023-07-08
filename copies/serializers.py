@@ -10,7 +10,7 @@ from books.models import Book
 class CopySerializers(serializers.ModelSerializer):
     class Meta:
         model = Copy
-        fields = ["id", "library_name", "created_at", "book"]
+        fields = ["id", "is_available", "library_name", "created_at", "book"]
         extra_kwargs = {
             "id": {"read_only": True},
             # "book": {"read_only": True}

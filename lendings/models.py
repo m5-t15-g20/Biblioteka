@@ -3,7 +3,7 @@ from datetime import date, timedelta
 
 
 class Lending(models.Model):
-    is_avaliable = models.BooleanField(default=True)
+    is_close = models.BooleanField(default=False)
     expire_date = models.DateField(default=date.today() + timedelta(days=7))
     lending_date = models.DateField()
     copy = models.ForeignKey(
