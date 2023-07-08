@@ -1,45 +1,52 @@
 from rest_framework import serializers, exceptions
 from .models import Lending
-from datetime import date, timedelta
+from datetime import date
+from users.models import User
+import ipdb
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "email",
+            "is_authorized",
+            "is_superuser",
+            "user_type",
+        ]
+        read_only_fields = ["password", "id"]
 
 
 class LeadingSerializer(serializers.ModelSerializer):
-    # id = serializers.IntegerField(read_only=True)
-    # is_avaliable = serializers.BooleanField(default=True)
     lending_date = serializers.DateField(default=date.today)
-    expire_date = serializers.SerializerMethodField()
+    expire_date = serializers.DateField()
+    user = UserSerializer(read_only=True)
 
     class Meta:
+        depth = 2
         model = Lending
-        fields = ["id", "is_avaliable", "expire_date", "lending_date", "user", "copy"]
-        # fields = "__all__"
-        read_only_fields = ["id"]
-
-    def get_expire_date(self, obj):
-        try:
-            return self.initial_data["expire_date"]
-        except Exception:
-            today = date.today()
-            delta = timedelta(days=7)
-            expire_date = today + delta
-
-            if expire_date.weekday() == 5:
-                days_to_add = 7 + expire_date.weekday() + 2
-                expire_date += timedelta(days=days_to_add)
-            if expire_date.weekday() == 6:
-                days_to_add = 7 + expire_date.weekday() + 1
-                expire_date += timedelta(days=days_to_add)
-
-            return expire_date
+        fields = "__all__"
 
     def create(self, validated_data: dict) -> Lending:
-        # ipdb.set_trace()
-        user = validated_data["user"]
 
+        user = validated_data["user"]
+        copy = validated_data["copy"]
         if user.is_authorized is False:
-            raise exceptions.AuthenticationFailed(
+            raise exceptions.PermissionDenied(
                 "User not authorized to make a lending"
             )
-        # ipdb.set_trace()
+        if copy.is_available is False:
+            raise exceptions.PermissionDenied(
+                "Copy not available for lending"
+            )
+        else:
+            copy.is_available = False
+            copy.save()
 
         return Lending.objects.create(**validated_data)
+
+
+class LendginCreate(LeadingSerializer):
+    expire_date = serializers.DateField(read_only=True)
