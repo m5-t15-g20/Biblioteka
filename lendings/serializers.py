@@ -5,7 +5,7 @@ from users.models import User
 import ipdb
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializerLending(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
@@ -22,7 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
 class LeadingSerializer(serializers.ModelSerializer):
     lending_date = serializers.DateField(default=date.today)
     expire_date = serializers.DateField()
-    user = UserSerializer(read_only=True)
+    user = UserSerializerLending(read_only=True)
 
     class Meta:
         depth = 2
