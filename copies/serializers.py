@@ -9,6 +9,7 @@ from books.models import Book
 
 class CopySerializers(serializers.ModelSerializer):
     class Meta:
+        depth = 1
         model = Copy
         fields = ["id", "is_available", "library_name", "created_at", "book"]
         extra_kwargs = {
