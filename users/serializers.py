@@ -17,7 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
             "password",
             "is_authorized",
             "is_superuser",
-            "user_type",
+            "type",
             "following",
         ]
         extra_kwargs = {
@@ -29,8 +29,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data: dict) -> User:
         if (
-            "user_type" in validated_data
-            and validated_data["user_type"] == "Library Collaborator"
+            "type" in validated_data
+            and validated_data["type"] == "Library Collaborator"
         ):
             return User.objects.create_superuser(**validated_data)
 
