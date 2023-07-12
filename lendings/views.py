@@ -1,6 +1,11 @@
 from .models import Lending
-from .serializers import LeadingSerializer, LendginCreate, UserSerializer
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, UpdateAPIView, ListAPIView
+from .serializers import LeadingSerializer, LendginCreate, UserSerializerLending
+from rest_framework.generics import (
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView,
+    UpdateAPIView,
+    ListAPIView,
+)
 from users.permissions import IsUserAdmin, IsOwnerOrAdmin
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.shortcuts import get_object_or_404
@@ -80,9 +85,7 @@ class CloseLendingView(UpdateAPIView):
         message = f'O livro "{book.title}" ficou disponível para empréstimo. Não perca a chance de lê-lo!'
         from_email = settings.EMAIL_HOST_USER
         recipient_list = [user.email]
-        send_mail(
-            subject, message, from_email, recipient_list, fail_silently=False
-        )
+        send_mail(subject, message, from_email, recipient_list, fail_silently=False)
         return super().update(request, *args, **kwargs)
 
 
@@ -103,6 +106,8 @@ class ListLendingsOfUserView(ListAPIView):
 
 
 class ExpiredLendingUpdateView(APIView):
+    serializer_class = UserSerializerLending
+
     def post(self, request):
         lendings = Lending.objects.all()
         updated_users = []
@@ -114,6 +119,10 @@ class ExpiredLendingUpdateView(APIView):
                 user.is_authorized = False
                 user.save()
                 updated_users.append(user)
-        updated_users_data = [UserSerializer(user).data for user in updated_users]
+        updated_users_data = [
+            UserSerializerLending(user).data for user in updated_users
+        ]
 
-        return Response({"updated_users": updated_users_data}, status=status.HTTP_200_OK)
+        return Response(
+            {"updated_users": updated_users_data}, status=status.HTTP_200_OK
+        )
